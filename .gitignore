@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Local environment files (keep templates)
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Build output and coverage
+dist/
+**/dist/
+coverage/
+
+# Logs and temporary files
+logs/
+*.log
+npm-debug.log*
+*.tmp
+*.temp
+
+# Tool caches and OS files
+.vite/
+.cache/
+.DS_Store
+Thumbs.db

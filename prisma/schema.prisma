@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Estudiante {
+  idEstudiante  Int             @id @default(autoincrement()) @map("ID_Estudiente")
+  nie           String          @map("NIE")
+  nombre        String          @map("Nombre")
+  responsable   String          @map("Responsable")
+  telefono      String          @map("Telefono")
+  llegadasTarde LlegadaTarde[]
+
+  @@map("Estudiantes")
+}
+
+model Grado {
+  idGrado       Int             @id @default(autoincrement()) @map("ID_Grado")
+  nombre        String          @map("Nombre")
+  llegadasTarde LlegadaTarde[]
+
+  @@map("Grados")
+}
+
+model LlegadaTarde {
+  idLlegadaTarde Int       @id @default(autoincrement()) @map("Id_Llegadas_Tardes")
+  idEstudiante   Int       @map("ID_Estudiente")
+  idGrado        Int       @map("ID_Grado")
+  horaLlegada    DateTime  @db.Time(0) @map("Hora_Llegada")
+  fecha          DateTime  @db.Date @map("Fecha")
+  detalle        String    @map("Detalle")
+  estudiante     Estudiante @relation(fields: [idEstudiante], references: [idEstudiante])
+  grado          Grado      @relation(fields: [idGrado], references: [idGrado])
+
+  @@map("LlegadasTardes")
+}
