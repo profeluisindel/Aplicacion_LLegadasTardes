@@ -1,21 +1,15 @@
 const express = require('express');
+const cors = require('cors');
 const apiRoutes = require('./routes');
-const errorHandler = require('./middleware/error-handler');
+const notFound = require('./middleware/notFound');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.json({ message: 'API Colegio La Pulida S.A.', api: '/api' });
-});
-
+app.use(cors());
+app.use(express.json({ limit: '100kb' }));
 app.use('/api', apiRoutes);
-
-app.use((req, res) => {
-  res.status(404).json({ error: 'Ruta no encontrada' });
-});
-
+app.use(notFound);
 app.use(errorHandler);
 
 module.exports = app;

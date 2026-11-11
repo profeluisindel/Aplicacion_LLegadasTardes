@@ -3,29 +3,31 @@ require('dotenv').config();
 const app = require('./app');
 const prisma = require('./config/prisma');
 
-const port = Number(process.env.PORT || 3000);
+const port = Number(process.env.PORT) || 3000;
 
 async function startServer() {
-  try {
-    await prisma.$connect();
-    const server = app.listen(port, () => {
-      console.log(`API escuchando en el puerto ${port}`);
+  await prisma.$connect();
+  const server = app.listen(port, () => {
+    console.log(`API disponible en http://localhost:${port}`);
+  });
+
+  let shuttingDown = false;
+  const shutdown = (signal) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`Señal ${signal} recibida; cerrando el servidor.`);
+    server.close(async () => {
+      await prisma.$disconnect();
+      process.exit(0);
     });
+  };
 
-    const shutdown = () => {
-      server.close(async () => {
-        await prisma.$disconnect();
-        process.exit(0);
-      });
-    };
-
-    process.on('SIGINT', shutdown);
-    process.on('SIGTERM', shutdown);
-  } catch (error) {
-    console.error('No se pudo iniciar la API:', error.message);
-    await prisma.$disconnect();
-    process.exitCode = 1;
-  }
+  process.on('SIGINT', () => shutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
 }
 
-startServer();
+startServer().catch(async (error) => {
+  console.error('No fue posible iniciar la API:', error.message);
+  await prisma.$disconnect();
+  process.exitCode = 1;
+});
